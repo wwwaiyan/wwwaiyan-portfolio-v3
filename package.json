@@ -1,0 +1,34 @@
+{
+  "name": "wys-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Personal portfolio website for Wai Yan Soe - DevOps Engineer",
+  "author": "Wai Yan Soe <hello.waiyansoe@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "framer-motion": "^12.23.26",
+    "lucide-react": "^0.562.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "recharts": "2.15.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "eslint": "^10.0.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.0",
+    "globals": "^17.3.0",
+    "typescript": "~5.8.2",
+    "typescript-eslint": "^8.54.0",
+    "vite": "^6.2.0"
+  }
+}

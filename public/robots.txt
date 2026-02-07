@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://waiyansoe.vercel.app/sitemap.xml
