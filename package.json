@@ -5,6 +5,9 @@
   "description": "Personal portfolio website for Wai Yan Soe - DevOps Engineer",
   "author": "Wai Yan Soe <hello.waiyansoe@gmail.com>",
   "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -20,9 +23,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@lhci/cli": "^0.15.1",
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
-    "eslint": "^10.0.0",
+    "eslint": "^9.0.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.0",

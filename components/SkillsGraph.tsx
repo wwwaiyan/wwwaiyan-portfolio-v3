@@ -21,7 +21,7 @@ export const SkillsGraph: React.FC = () => {
   }));
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
@@ -31,26 +31,26 @@ export const SkillsGraph: React.FC = () => {
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
           <PolarGrid stroke="#71717a" strokeOpacity={0.3} />
-          
-          <PolarAngleAxis 
-            dataKey="subject" 
-            tick={({ payload, x, y, textAnchor, stroke, radius }) => {
-                return (
-                  <text
-                    x={x}
-                    y={y}
-                    className="text-xs md:text-sm font-bold font-mono fill-zinc-600 dark:fill-zinc-300"
-                    textAnchor={textAnchor}
-                  >
-                    {payload.value}
-                  </text>
-                );
+
+          <PolarAngleAxis
+            dataKey="subject"
+            tick={({ payload, x, y, textAnchor }) => {
+              return (
+                <text
+                  x={x}
+                  y={y}
+                  className="text-xs md:text-sm font-bold font-mono fill-zinc-600 dark:fill-zinc-300"
+                  textAnchor={textAnchor}
+                >
+                  {payload.value}
+                </text>
+              );
             }}
           />
-          
+
           {/* Hidden radius axis to set scale */}
           <PolarRadiusAxis angle={30} domain={[0, 8]} tick={false} axisLine={false} />
-          
+
           <Radar
             name="Skills"
             dataKey="A"
@@ -61,7 +61,7 @@ export const SkillsGraph: React.FC = () => {
           />
         </RadarChart>
       </ResponsiveContainer>
-      
+
       {/* Decorative center glowing dot */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-cyan-500 rounded-full blur-[10px]" />
     </motion.div>

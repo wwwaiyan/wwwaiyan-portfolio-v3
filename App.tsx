@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
 import { Hero } from './components/Hero';
 import { Experience } from './components/Experience';
@@ -8,13 +8,17 @@ import { Achievements } from './components/Achievements';
 import { Certificates } from './components/Certificates';
 import { Footer } from './components/Footer';
 import { BackgroundEffect } from './components/BackgroundEffect';
-import { RESUME_DATA } from './constants';
 import { ArrowUp, Moon, Sun, FileDown } from 'lucide-react';
 import { Blog } from './components/Blog';
 
 const App: React.FC = () => {
-  const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  /* Removed mounted state to fix lint error and simplified theme init */
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      return 'light';
+    }
+    return 'dark';
+  });
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -35,14 +39,7 @@ const App: React.FC = () => {
     return () => unsubscribe();
   }, [scrollY]);
 
-  // Handle Theme
-  useEffect(() => {
-    setMounted(true);
-    // Check system preference on load
-    if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-      setTheme('light');
-    }
-  }, []);
+  /* Theme initialization handled in useState now */
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -68,7 +65,7 @@ const App: React.FC = () => {
     }, 100);
   };
 
-  if (!mounted) return null;
+  /* Removed mounted check */
 
   return (
     <main className="min-h-screen selection:bg-cyan-500/30 selection:text-cyan-800 dark:selection:text-cyan-100 relative">

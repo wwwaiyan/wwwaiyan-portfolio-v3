@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RESUME_DATA } from '../constants';
 import * as Icons from 'lucide-react';
@@ -14,12 +14,7 @@ export const Footer: React.FC<FooterProps> = ({ isOpen, setIsOpen }) => {
     const [isSuccess, setIsSuccess] = useState(false);
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
-    // Reset success state when closing/opening
-    useEffect(() => {
-        if (isOpen) {
-            setIsSuccess(false);
-        }
-    }, [isOpen]);
+    /* Removed useEffect that caused lint error */
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -62,7 +57,7 @@ export const Footer: React.FC<FooterProps> = ({ isOpen, setIsOpen }) => {
                             exit={{ opacity: 0, scale: 0.95 }}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            onClick={() => setIsOpen(true)}
+                            onClick={() => { setIsOpen(true); setIsSuccess(false); }}
                             className="group relative inline-flex items-center gap-3 px-8 py-4 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-black rounded-full font-bold tracking-wide hover:bg-cyan-600 dark:hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20"
                         >
                             <MessageSquare size={20} className="group-hover:-rotate-12 transition-transform duration-300" />
@@ -182,7 +177,7 @@ export const Footer: React.FC<FooterProps> = ({ isOpen, setIsOpen }) => {
                     className="flex justify-center gap-6 mb-12 flex-wrap"
                 >
                     {RESUME_DATA.links.map((link, i) => {
-                        const IconComponent = (Icons as any)[link.icon] || Icons.Link;
+                        const IconComponent = (Icons as unknown as Record<string, React.ElementType>)[link.icon] || Icons.Link;
                         return (
                             <motion.a
                                 key={i}
