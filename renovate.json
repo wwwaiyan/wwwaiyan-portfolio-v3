@@ -1,24 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base",            // 1. Use standard best practices
-    ":enablePreCommit"       // 2. Enable pre-commit hook updates
-    // "schedule:earlyMondays"   // 3. Only run on Monday mornings (reduce noise)
-  ],
-  "labels": ["dependencies", "auto-update"],
-  
-  "packageRules": [
-    {
-      "matchManagers": ["github-actions"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true,      // 4. Auto-merge small updates (v5.0 -> v5.1)
-      "groupName": "github-actions" // 5. Group all action updates into ONE PR
-    },
-    {
-      "matchManagers": ["github-actions"],
-      "matchUpdateTypes": ["major"],
-      "automerge": false,     // 6. Do NOT auto-merge major updates (v5 -> v6)
-      "prCreation": "immediate" 
-    }
+    "github>wwwaiyan/devops-renovate-config:default"
   ]
 }
