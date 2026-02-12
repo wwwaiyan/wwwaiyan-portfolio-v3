@@ -4,9 +4,11 @@
   "enabledManagers": ["github-actions"],
   "extends": [
     "config:recommended"
-    // "helpers:pinGitHubActionDigests"
   ],
-  "prTitle": "renovate[bot]: {{body}}",
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "github-actions"
+  "reviewers": ["wwwaiyan"]
   "prConcurrentLimit": 0,
   "prHourlyLimit": 0,
   "packageRules": [
@@ -16,11 +18,15 @@
       "groupName": "github-actions",
       "automerge": true,
       "automergeType": "branch",
-      // "minimumReleaseAge": "3 days",
       "matchUpdateTypes": ["minor", "patch", "digest"]
+    },
+    {
+      "description": "Require manual review for Major updates",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false
     }
   ],
-  // "schedule": ["before 4am on Monday"],
   "prCreation": "immediate",
   "rebaseWhen": "behind-base-branch"
 }
