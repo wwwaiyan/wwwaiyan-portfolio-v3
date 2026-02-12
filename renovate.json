@@ -1,14 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Renovate Bot for GitHub Actions",
   "enabledManagers": ["github-actions"],
   "extends": [
     "config:recommended"
   ],
   "semanticCommits": "enabled",
   "semanticCommitType": "chore",
-  "semanticCommitScope": "github-actions"
-  "reviewers": ["wwwaiyan"]
+  "semanticCommitScope": "github-actions",
+  "reviewers": ["wwwaiyan"],
   "prConcurrentLimit": 0,
   "prHourlyLimit": 0,
   "packageRules": [
