@@ -44,6 +44,7 @@ Desktop.ini
 # Testing
 coverage/
 .nyc_output/
+.lighthouseci/
 
 # Cache
 .cache/
@@ -55,3 +56,4 @@ coverage/
 *.local
 *.bak
 *.tmp
+tmp/
