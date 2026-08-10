@@ -16,5 +16,12 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          motion: ['framer-motion'],
+        },
+      },
+    },
   }
 });

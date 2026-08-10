@@ -1,119 +1,276 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { RESUME_DATA } from '../constants';
-import { ChevronDown } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'framer-motion';
+import { ArrowDown, FileText, Github, Linkedin } from 'lucide-react';
+import { AVAILABLE_ROLES, RESUME_DATA } from '../constants';
 
-export const Hero: React.FC = () => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
+interface HeroProps {
+  onOpenResume: () => void;
+}
 
-  // Transform scroll Y into opacity (1 -> 0) and blur (0px -> 10px)
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
-  const blur = useTransform(scrollY, [0, 300], ["0px", "10px"]);
-  const scale = useTransform(scrollY, [0, 300], [1, 0.9]);
+interface InteractiveNameProps {
+  name: string;
+  reducedMotion: boolean;
+  onActiveChange: (active: boolean) => void;
+}
 
-  // Refined staggered text reveal
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15, // Slightly tighter stagger for cohesion
-        delayChildren: 0.2
-      }
-    }
+const PRIMARY_ROLE = 'DevOps & Platform Engineer';
+
+const containerVariants = {
+  hidden: { opacity: 1 },
+  visible: {
+    opacity: 1,
+    transition: {
+      delayChildren: 0.12,
+      staggerChildren: 0.09,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const InteractiveName: React.FC<InteractiveNameProps> = ({ name, reducedMotion, onActiveChange }) => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isActive, setIsActive] = useState(false);
+  const rawTagX = useMotionValue(0);
+  const rawTagY = useMotionValue(0);
+  const tagX = useSpring(rawTagX, { stiffness: 280, damping: 26, mass: 0.28 });
+  const tagY = useSpring(rawTagY, { stiffness: 280, damping: 26, mass: 0.28 });
+  const words = name.split(' ');
+  const wordOffsets = words.map((_, wordIndex) =>
+    words.slice(0, wordIndex).reduce((total, word) => total + word.length, 0)
+  );
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLSpanElement>) => {
+    if (reducedMotion || event.pointerType !== 'mouse') return;
+
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const localX = event.clientX - bounds.left;
+    const localY = event.clientY - bounds.top;
+    rawTagX.set(Math.max(8, Math.min(bounds.width - 190, localX + 14)));
+    rawTagY.set(Math.max(-18, localY - 30));
+    setIsActive(true);
+    onActiveChange(true);
   };
 
-  const itemVariants = {
-    hidden: {
-      y: 15, // Reduced from 20 for subtler movement
-      opacity: 0,
-      filter: 'blur(5px)' // Reduced from 10px for a softer, less aggressive effect
-    },
-    visible: {
-      y: 0,
-      opacity: 1,
-      filter: 'blur(0px)',
-      transition: {
-        duration: 1.2, // Slower duration for elegance
-        ease: [0.25, 1, 0.5, 1] // Cubic bezier for a smooth "settling" effect
-      }
-    }
+  const resetName = () => {
+    setHoveredIndex(null);
+    setIsActive(false);
+    onActiveChange(false);
   };
 
   return (
-    <section ref={ref} className="relative h-screen flex items-center justify-center overflow-hidden bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
-      {/* Background ambient glow */}
-      <div className="absolute inset-0 bg-gradient-to-b from-zinc-200 via-zinc-50 to-zinc-50 dark:from-black dark:via-zinc-950 dark:to-zinc-950 z-0" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
+    <span
+      className="relative inline-block cursor-default"
+      onPointerMove={handlePointerMove}
+      onPointerLeave={resetName}
+    >
+      <span aria-hidden="true">
+        {words.map((word, wordIndex) => (
+          <React.Fragment key={word}>
+            <span className="inline-flex whitespace-nowrap">
+              {Array.from(word).map((character, characterIndex) => {
+                const index = wordOffsets[wordIndex] + characterIndex;
+                const distance = hoveredIndex === null ? Number.POSITIVE_INFINITY : Math.abs(index - hoveredIndex);
+                const lift = reducedMotion ? 0 : distance === 0 ? -9 : distance === 1 ? -5 : distance === 2 ? -2 : 0;
+                const rotation = reducedMotion || distance > 1
+                  ? 0
+                  : index < (hoveredIndex ?? index) ? -1.5 : index > (hoveredIndex ?? index) ? 1.5 : 0;
+
+                return (
+                  <motion.span
+                    key={`${character}-${characterIndex}`}
+                    className={`inline-block transition-colors duration-200 ${
+                      distance === 0
+                        ? 'text-cyan-600 dark:text-cyan-300'
+                        : distance === 1
+                          ? 'text-cyan-700 dark:text-cyan-200'
+                          : 'text-zinc-950 dark:text-white'
+                    }`}
+                    animate={{ y: lift, rotate: rotation }}
+                    transition={{ type: 'spring', stiffness: 360, damping: 24, mass: 0.35 }}
+                    onPointerEnter={(event) => {
+                      if (!reducedMotion && event.pointerType === 'mouse') setHoveredIndex(index);
+                    }}
+                  >
+                    {character}
+                  </motion.span>
+                );
+              })}
+            </span>
+            {wordIndex < words.length - 1 && ' '}
+          </React.Fragment>
+        ))}
+      </span>
+
+      <AnimatePresence>
+        {isActive && (
+          <motion.span
+            initial={{ opacity: 0, scale: 0.9, y: 4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94, y: 3 }}
+            transition={{ duration: 0.18 }}
+            style={{ x: tagX, top: tagY }}
+            className="pointer-events-none absolute left-0 z-10 whitespace-nowrap font-mono text-[10px] font-semibold uppercase text-cyan-700 dark:text-cyan-300"
+          >
+            {PRIMARY_ROLE}
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </span>
+  );
+};
+
+export const Hero: React.FC<HeroProps> = ({ onOpenResume }) => {
+  const prefersReducedMotion = useReducedMotion();
+  const [isRoleFollowing, setIsRoleFollowing] = useState(false);
+  const { scrollY } = useScroll();
+  const opacity = useTransform(scrollY, [0, 360], [1, 0]);
+  const y = useTransform(scrollY, [0, 360], [0, -28]);
+  const cueOpacity = useTransform(scrollY, [0, 160], [1, 0]);
+  const rawPointerX = useMotionValue(0);
+  const rawPointerY = useMotionValue(0);
+  const pointerX = useSpring(rawPointerX, { stiffness: 90, damping: 26, mass: 0.45 });
+  const pointerY = useSpring(rawPointerY, { stiffness: 90, damping: 26, mass: 0.45 });
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLElement>) => {
+    if (prefersReducedMotion) return;
+
+    const bounds = event.currentTarget.getBoundingClientRect();
+    rawPointerX.set(((event.clientX - bounds.left) / bounds.width - 0.5) * -7);
+    rawPointerY.set(((event.clientY - bounds.top) / bounds.height - 0.5) * -5);
+  };
+
+  const resetPointer = () => {
+    rawPointerX.set(0);
+    rawPointerY.set(0);
+  };
+
+  return (
+    <section
+      className="relative flex min-h-[76svh] items-center overflow-hidden bg-zinc-50 transition-colors duration-300 dark:bg-zinc-950 md:min-h-[82svh]"
+      onPointerMove={handlePointerMove}
+      onPointerLeave={resetPointer}
+    >
 
       <motion.div
-        style={{ opacity, filter: `blur(${blur})`, scale }}
+        style={{ opacity, y }}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="relative z-10 text-center px-4"
+        className="relative z-40 mx-auto w-full max-w-7xl px-6 pb-10 pt-24 md:px-10 md:pb-14 md:pt-28"
       >
-        <motion.p variants={itemVariants} className="text-cyan-600 dark:text-cyan-400 font-mono text-sm tracking-widest mb-4 uppercase">
-          Portfolio
-        </motion.p>
-        <motion.h1 variants={itemVariants} className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter text-zinc-900 dark:text-white mb-6">
-          {RESUME_DATA.name.split(' ').map((n, i) => (
-            <span key={i} className="inline-block mr-4 md:mr-8">{n}</span>
-          ))}
-        </motion.h1>
-        <motion.h2 variants={itemVariants} className="text-xl md:text-3xl text-zinc-600 dark:text-zinc-400 font-light tracking-wide">
-          {RESUME_DATA.title}
-        </motion.h2>
+        <motion.div className="max-w-5xl" style={{ x: pointerX, y: pointerY }}>
+          <motion.div
+            variants={itemVariants}
+            className="mb-7 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs font-semibold uppercase text-cyan-700 dark:text-cyan-400 md:text-sm"
+          >
+            <span className="h-px w-8 bg-zinc-400 dark:bg-zinc-600" />
+            <motion.span
+              animate={{ opacity: isRoleFollowing ? 0 : 1, y: isRoleFollowing ? -4 : 0 }}
+              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {PRIMARY_ROLE}
+            </motion.span>
+          </motion.div>
 
-        <motion.div variants={itemVariants} className="mt-6 flex flex-wrap justify-center gap-3 md:gap-6 text-zinc-500 text-xs md:text-sm font-mono">
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            {RESUME_DATA.contact.location}
-          </span>
-          <span className="hidden md:inline text-zinc-300 dark:text-zinc-700">|</span>
-          <span>AWS • K8s • Terraform • CI/CD</span>
-        </motion.div>
+          <h1
+            aria-label={RESUME_DATA.name}
+            className="max-w-5xl text-6xl font-bold leading-[0.98] tracking-normal text-zinc-950 dark:text-white sm:text-7xl lg:text-[7rem]"
+          >
+            <InteractiveName
+              name={RESUME_DATA.name}
+              reducedMotion={Boolean(prefersReducedMotion)}
+              onActiveChange={setIsRoleFollowing}
+            />
+          </h1>
 
-        {/* Professional Summary - Attractive Card */}
-        <motion.div
-          variants={itemVariants}
-          className="mt-10 max-w-3xl mx-auto"
-        >
-          <div className="relative p-6 md:p-8 rounded-2xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 shadow-xl shadow-zinc-900/5 dark:shadow-black/20">
-            {/* Decorative quote mark */}
-            <span className="absolute -top-4 left-6 text-6xl text-cyan-500/20 font-serif">"</span>
+          <p className="mt-7 max-w-3xl text-xl leading-relaxed text-zinc-600 dark:text-zinc-300 md:text-2xl md:leading-relaxed">
+            I build reliable cloud platforms and automation, and I am exploring agentic operations for safer, faster delivery.
+          </p>
 
-            <p className="relative text-zinc-700 dark:text-zinc-300 text-sm md:text-base lg:text-lg leading-relaxed text-center md:text-left">
-              <span className="text-cyan-600 dark:text-cyan-400 font-semibold">DevOps Engineer</span> with{' '}
-              <span className="font-semibold text-zinc-900 dark:text-white">3+ years</span> of experience building{' '}
-              <span className="underline decoration-cyan-500/50 decoration-2 underline-offset-2">scalable cloud infrastructure</span>,{' '}
-              automated CI/CD pipelines, and secure DevSecOps practices.
-              Passionate about creating reliable systems that empower teams to ship faster.
-            </p>
+          <motion.div
+            variants={itemVariants}
+            aria-label={`Available for ${AVAILABLE_ROLES.join(', ')}`}
+            className="mt-6 flex max-w-4xl flex-wrap items-center gap-x-3 gap-y-2 font-mono text-xs text-zinc-500 dark:text-zinc-400 md:text-sm"
+          >
+            <span className="inline-flex items-center gap-2 font-semibold uppercase text-zinc-700 dark:text-zinc-200">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.1)]" />
+              Available for
+            </span>
+            {AVAILABLE_ROLES.map((role) => (
+              <span key={role}>{role}</span>
+            ))}
+          </motion.div>
 
-            {/* Tech pills */}
-            <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-5">
-              {['AWS', 'Kubernetes', 'Terraform', 'Docker', 'GitOps', 'Prometheus'].map((tech) => (
-                <span
-                  key={tech}
-                  className="px-3 py-1 text-xs font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-full border border-zinc-200 dark:border-zinc-700 hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors cursor-default"
-                >
-                  {tech}
-                </span>
-              ))}
+          <motion.div
+            variants={itemVariants}
+            className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center"
+          >
+            <button
+              type="button"
+              onClick={onOpenResume}
+              className="inline-flex h-12 items-center gap-2 rounded-full bg-zinc-950 px-6 text-sm font-semibold text-white transition-colors hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 dark:bg-white dark:text-zinc-950 dark:hover:bg-cyan-300 dark:focus:ring-offset-zinc-950"
+            >
+              <FileText size={18} />
+              View resume
+            </button>
+
+            <div className="flex items-center gap-3">
+              <a
+                href="https://github.com/wwwaiyan"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub profile"
+                title="GitHub"
+                className="ui-icon inline-flex h-12 w-12 items-center justify-center rounded-full border border-zinc-300 bg-zinc-50 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300"
+              >
+                <Github size={19} />
+              </a>
+
+              <a
+                href="https://linkedin.com/in/waiyansoe"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn profile"
+                title="LinkedIn"
+                className="ui-icon inline-flex h-12 w-12 items-center justify-center rounded-full border border-zinc-300 bg-zinc-50 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300"
+              >
+                <Linkedin size={19} />
+              </a>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </motion.div>
 
-      <motion.div
-        animate={{ y: [0, 8, 0] }} // Reduced bounce height slightly
-        transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-zinc-400 dark:text-zinc-600"
+      <motion.a
+        href="#experience"
+        aria-label="Scroll to experience"
+        style={{ opacity: cueOpacity }}
+        className="group absolute bottom-6 left-1/2 z-40 hidden -translate-x-1/2 text-zinc-500 transition-colors hover:text-cyan-700 dark:text-zinc-500 dark:hover:text-cyan-300 md:block"
       >
-        <ChevronDown size={24} />
-      </motion.div>
+        <motion.span
+          animate={prefersReducedMotion ? undefined : { y: [0, 5, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+          className="ui-icon flex h-10 w-10 items-center justify-center rounded-full border border-zinc-300 bg-white/55 text-zinc-700 backdrop-blur-sm dark:border-zinc-700 dark:bg-zinc-900/55 dark:text-zinc-300"
+        >
+          <ArrowDown size={17} />
+        </motion.span>
+      </motion.a>
     </section>
   );
 };

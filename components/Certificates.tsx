@@ -11,22 +11,22 @@ export const Certificates: React.FC = () => {
 
                 {/* Header */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 12 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
                     className="text-center mb-16"
                 >
                     <h2 className="text-3xl md:text-5xl font-bold mb-4 text-zinc-900 dark:text-white tracking-tight">
-                        Certifications & Learning Badges
+                        Certifications & Cloud-Native Credentials
                     </h2>
                     <p className="text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto">
-                        Validated expertise through industry-recognized credentials and specialized courses.
+                        Certifications and cloud-native training, listed by issuer.
                     </p>
                 </motion.div>
 
                 {/* Unified Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                     {RESUME_DATA.certificates.map((cert, index) => (
                         <motion.a
                             key={index}
@@ -37,29 +37,27 @@ export const Certificates: React.FC = () => {
                             whileInView="visible"
                             viewport={{ once: true }}
                             variants={{
-                                hidden: { opacity: 0, y: 20 },
+                                hidden: { opacity: 0, y: 12 },
                                 visible: {
                                     opacity: 1,
                                     y: 0,
                                     transition: {
-                                        duration: 0.6,
+                                        duration: 0.45,
                                         ease: [0.22, 1, 0.36, 1],
-                                        delay: index * 0.1
+                                        delay: index * 0.05
                                     }
                                 }
                             }}
-                            whileHover={{ y: -5, scale: 1.02 }}
-                            className="group relative flex flex-col items-center text-center p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:border-cyan-500/30 hover:shadow-xl hover:shadow-cyan-900/10 transition-all duration-300"
+                            className="ui-card group relative flex flex-col items-center text-center p-6 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-sm"
                         >
-                            {/* Decorative Background Glow */}
-                            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-zinc-50 dark:to-zinc-900/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
                             {/* Logo Image - Big transparent logo without border */}
-                            <div className="relative mb-4 w-32 h-32 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                            <div className="relative mb-4 w-32 h-32 flex items-center justify-center">
                                 <img
                                     src={cert.logo}
                                     alt={cert.title}
                                     loading="lazy"
+                                    width={128}
+                                    height={128}
                                     className="w-full h-full object-contain drop-shadow-md"
                                 />
                             </div>

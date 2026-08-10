@@ -2,39 +2,44 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { RESUME_DATA } from '../constants';
 import { Achievement } from '../types';
+import { Activity, GitBranch, LucideIcon, ShieldCheck } from 'lucide-react';
+
+const achievementIcons: Record<string, LucideIcon> = {
+  'CI/CD': GitBranch,
+  Security: ShieldCheck,
+  Observability: Activity,
+};
 
 const AchievementCard: React.FC<{ data: Achievement; index: number }> = ({ data, index }) => {
   // Helper to split the metric string (e.g., "-35% Build Time") into value and label
   const firstSpaceIndex = data.metric.indexOf(' ');
   const metricValue = firstSpaceIndex !== -1 ? data.metric.slice(0, firstSpaceIndex) : data.metric;
   const metricLabel = firstSpaceIndex !== -1 ? data.metric.slice(firstSpaceIndex + 1) : '';
+  const Icon = achievementIcons[data.category] ?? Activity;
 
   return (
-    <div className="sticky top-24 md:top-32 mb-6 last:mb-0">
+    <div className="mb-6 last:mb-0 md:sticky md:top-28" style={{ zIndex: index + 1 }}>
       <motion.div 
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-50px" }}
         variants={{
-            hidden: { opacity: 0, y: 20 },
+            hidden: { opacity: 0, y: 12 },
             visible: { 
                 opacity: 1, 
                 y: 0,
-                transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], staggerChildren: 0.1 }
+                transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] }
             }
         }}
-        className="relative overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm p-6 md:p-8 hover:border-cyan-500/20 transition-colors duration-300"
+        className="ui-card relative overflow-hidden rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm p-6 md:p-8"
       >
         
-        {/* Subtle Gradient Decor */}
-        <div className="absolute -top-12 -right-12 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
-
         <div className="flex flex-col md:flex-row gap-6 items-start md:items-center relative z-10">
           
           {/* Main Content (Left) */}
           <div className="flex-1 space-y-3">
              <div className="flex items-center gap-2">
-                <span className="w-4 h-0.5 bg-cyan-500"></span>
+                <Icon size={16} className="text-cyan-700 dark:text-cyan-400" />
                 <span className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
                   {data.category}
                 </span>
@@ -53,7 +58,7 @@ const AchievementCard: React.FC<{ data: Achievement; index: number }> = ({ data,
                   <motion.li 
                     key={i} 
                     variants={{
-                        hidden: { opacity: 0, y: 10 }, // Changed from x slide to y lift
+                        hidden: { opacity: 0, y: 5 },
                         visible: { opacity: 1, y: 0 }
                     }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
@@ -64,6 +69,10 @@ const AchievementCard: React.FC<{ data: Achievement; index: number }> = ({ data,
                   </motion.li>
                 ))}
              </ul>
+
+             <p className="border-t border-zinc-100 pt-3 font-mono text-xs leading-relaxed text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+               Basis: {data.evidence}
+             </p>
           </div>
 
           {/* Metric Visual (Right or Bottom) */}
@@ -104,7 +113,7 @@ const AchievementCard: React.FC<{ data: Achievement; index: number }> = ({ data,
 
 export const Achievements: React.FC = () => {
   return (
-    <section className="relative py-24 bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
+    <section className="relative isolate overflow-clip py-24 bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
       <div className="max-w-4xl mx-auto px-4 md:px-8">
         
         <div className="mb-12">
@@ -112,7 +121,7 @@ export const Achievements: React.FC = () => {
             Key Achievements
             </h2>
             <p className="text-zinc-500 dark:text-zinc-400 text-lg max-w-2xl font-light">
-            Quantifiable results delivered through engineering excellence.
+            Achievements from platform and DevOps work.
             </p>
         </div>
         
